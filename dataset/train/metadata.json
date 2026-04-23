@@ -1,0 +1,58 @@
+{
+  "dataset": "LFW (Labeled Faces in the Wild)",
+  "n_identities": 10,
+  "identities": [
+    {
+      "name": "George W Bush",
+      "registration_count": 265,
+      "test_count": 265
+    },
+    {
+      "name": "Colin Powell",
+      "registration_count": 118,
+      "test_count": 118
+    },
+    {
+      "name": "Tony Blair",
+      "registration_count": 72,
+      "test_count": 72
+    },
+    {
+      "name": "Donald Rumsfeld",
+      "registration_count": 60,
+      "test_count": 61
+    },
+    {
+      "name": "Gerhard Schroeder",
+      "registration_count": 54,
+      "test_count": 55
+    },
+    {
+      "name": "Ariel Sharon",
+      "registration_count": 38,
+      "test_count": 39
+    },
+    {
+      "name": "Hugo Chavez",
+      "registration_count": 35,
+      "test_count": 36
+    },
+    {
+      "name": "Junichiro Koizumi",
+      "registration_count": 30,
+      "test_count": 30
+    },
+    {
+      "name": "Jean Chretien",
+      "registration_count": 27,
+      "test_count": 28
+    },
+    {
+      "name": "John Ashcroft",
+      "registration_count": 26,
+      "test_count": 27
+    }
+  ],
+  "registration_dir": "C:\\Users\\ultra\\Desktop\\Missingchild\\dataset\\data\\registration",
+  "test_dir": "C:\\Users\\ultra\\Desktop\\Missingchild\\dataset\\data\\test"
+}

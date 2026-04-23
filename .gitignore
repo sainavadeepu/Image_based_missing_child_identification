@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+ENV/
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Models & Weights
+models/*.pt
+models/*.pth
+models/*.onnx
+models/*.h5
+backend/models_cache/
+~/.deepface/
+~/.insightface/
+models/.insightface/
+models/.deepface/
+
+# Dataset
+dataset/lfw/
+dataset/data/
+
+# Uploads
+backend/uploads/
+backend/static/uploads/
+
+# Node / Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/dist/
+frontend/.cache/
+frontend/build/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Docker
+*.override.yml
+
+# Database
+*.db
+*.sqlite3

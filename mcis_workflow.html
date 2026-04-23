@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MCIS – Overall Workflow</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f4f8;
+      color: #1e293b;
+      padding: 40px 20px;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #0369a1 100%);
+      color: #fff;
+      padding: 48px 48px 36px;
+    }
+    .header .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .header h1 {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    .header p {
+      font-size: 15px;
+      opacity: 0.75;
+      max-width: 540px;
+      line-height: 1.6;
+    }
+    .header .meta {
+      margin-top: 20px;
+      font-size: 12px;
+      opacity: 0.55;
+    }
+
+    /* ── Body ── */
+    .body { padding: 40px 48px 48px; }
+
+    /* ── Section ── */
+    .section { margin-bottom: 36px; }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .section-title .icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ── Architecture Boxes ── */
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .arch-box {
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+    .arch-box .arch-icon { font-size: 24px; margin-bottom: 6px; }
+    .arch-box .arch-name { font-size: 13px; font-weight: 700; color: #0f172a; }
+    .arch-box .arch-sub { font-size: 11px; color: #64748b; margin-top: 2px; }
+    .arch-box .arch-port {
+      display: inline-block;
+      margin-top: 8px;
+      font-family: 'Fira Code', monospace;
+      font-size: 10px;
+      background: #f1f5f9;
+      border-radius: 4px;
+      padding: 2px 8px;
+      color: #0369a1;
+    }
+    .arch-box.fe { border-color: #6366f1; background: #eef2ff; }
+    .arch-box.be { border-color: #0369a1; background: #e0f2fe; }
+    .arch-box.db { border-color: #059669; background: #ecfdf5; }
+
+    /* ── Workflow Steps ── */
+    .workflow-step {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .workflow-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 44px;
+      width: 2px;
+      height: calc(100% - 24px);
+      background: #e2e8f0;
+    }
+    .step-num {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px;
+      flex-shrink: 0;
+      z-index: 1;
+    }
+    .step-content { flex: 1; }
+    .step-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #0f172a; }
+    .step-desc { font-size: 13px; color: #475569; line-height: 1.6; }
+
+    .step-num.auth   { background: #fef3c7; color: #92400e; }
+    .step-num.reg    { background: #dbeafe; color: #1d4ed8; }
+    .step-num.search { background: #d1fae5; color: #065f46; }
+    .step-num.alert  { background: #fee2e2; color: #991b1b; }
+    .step-num.dash   { background: #ede9fe; color: #5b21b6; }
+
+    /* ── Code Block ── */
+    .code-block {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: 'Fira Code', monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      margin-top: 10px;
+      overflow-x: auto;
+    }
+    .code-block .cm  { color: #64748b; }
+    .code-block .kw  { color: #38bdf8; }
+    .code-block .fn  { color: #a78bfa; }
+    .code-block .st  { color: #4ade80; }
+    .code-block .nm  { color: #fb923c; }
+    .code-block .op  { color: #f472b6; }
+
+    /* ── Pipeline ── */
+    .pipeline {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      margin: 8px 0;
+    }
+    .pip-step {
+      background: #f1f5f9;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e293b;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .pip-arrow {
+      font-size: 16px;
+      color: #94a3b8;
+      padding: 0 6px;
+      flex-shrink: 0;
+    }
+    .pip-step.highlight { background: #dbeafe; border-color: #3b82f6; color: #1d4ed8; }
+
+    /* ── Tables ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead tr { background: #f8fafc; }
+    th {
+      text-align: left;
+      padding: 10px 14px;
+      font-weight: 600;
+      color: #475569;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { font-family: 'Fira Code', monospace; font-size: 12px; color: #0369a1; font-weight: 500; }
+    td code {
+      font-family: 'Fira Code', monospace;
+      font-size: 11px;
+      background: #f1f5f9;
+      border-radius: 4px;
+      padding: 1px 6px;
+      color: #7c3aed;
+    }
+
+    /* ── Key decisions ── */
+    .decision-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .decision-card {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .decision-card .dc-what { font-size: 12px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .decision-card .dc-why  { font-size: 12px; color: #64748b; line-height: 1.5; }
+    .decision-card .dc-tag  {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      border-radius: 4px;
+      padding: 2px 8px;
+      margin-bottom: 8px;
+    }
+    .tag-ai   { background: #dbeafe; color: #1d4ed8; }
+    .tag-db   { background: #d1fae5; color: #065f46; }
+    .tag-sec  { background: #fef3c7; color: #92400e; }
+    .tag-ux   { background: #ede9fe; color: #5b21b6; }
+
+    /* ── Footer ── */
+    .footer {
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      padding: 20px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    /* ── Print ── */
+    @media print {
+      body { background: #fff; padding: 0; }
+      .page { box-shadow: none; border-radius: 0; max-width: 100%; }
+      .workflow-step:not(:last-child)::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="badge">📋 System Documentation</div>
+    <h1>Missing Child Identification System<br>— Overall Workflow</h1>
+    <p>An AI-powered facial recognition system for identifying and locating missing children using InsightFace ArcFace embeddings and PostgreSQL pgvector similarity search.</p>
+    <div class="meta">Generated: March 26, 2026 &nbsp;|&nbsp; Version: Production (InsightFace/ONNX)</div>
+  </div>
+
+  <div class="body">
+
+    <!-- ARCHITECTURE -->
+    <div class="section">
+      <div class="section-title">
+        <div class="icon" style="background:#e0f2fe;">🏗️</div>
+        System Architecture
+      </div>
+      <div class="arch-grid">
+        <div class="arch-box fe">
+          <div class="arch-icon">⚛️</div>
+          <div class="arch-name">Frontend</div>
+          <div class="arch-sub">React + Vite + TailwindCSS<br>Served via Nginx</div>
+          <div class="arch-port">:80</div>
+        </div>
+        <div class="arch-box be">
+          <div class="arch-icon">⚡</div>
+          <div class="arch-name">Backend API</div>
+          <div class="arch-sub">FastAPI + InsightFace<br>ONNX Runtime (CPU)</div>
+          <div class="arch-port">:8000</div>
+        </div>
+        <div class="arch-box db">
+          <div class="arch-icon">🐘</div>
+          <div class="arch-name">Database</div>
+          <div class="arch-sub">PostgreSQL 16<br>+ pgvector extension</div>
+          <div class="arch-port">:5432</div>
+        </div>
+      </div>
+      <p style="font-size:12px; color:#64748b;">All three services are orchestrated via <code style="font-family:monospace; background:#f1f5f9; padding:1px 6px; border-radius:4px;">docker-compose.yml</code>. The frontend proxies all <code style="font-family:monospace; background:#f1f5f9; padding:1px 6px; border-radius:4px;">/api/*</code> requests to the backend container.</p>
+    </div>
+
+    <!-- WORKFLOW STEPS -->
+    <div class="section">
+      <div class="section-title">
+        <div class="icon" style="background:#fef3c7;">🔄</div>
+        End-to-End Workflow
+      </div>
+
+      <!-- Step 1: Startup -->
+      <div class="workflow-step">
+        <div class="step-num" style="background:#f1f5f9; color:#0f172a;">1</div>
+        <div class="step-content">
+          <div class="step-title">🚀 System Startup</div>
+          <div class="step-desc">PostgreSQL starts and becomes healthy. The FastAPI backend then initializes: creates <strong>children</strong> and <strong>search_logs</strong> DB tables, loads the <strong>InsightFace buffalo_l</strong> model (SCRFD + ArcFace) into memory, and mounts the uploads directory.</div>
+          <div class="code-block"><span class="kw">docker-compose up --build</span>
+→ db (postgres + pgvector) starts → healthcheck passes
+→ backend starts → <span class="fn">init_db()</span> creates tables
+→ InsightFace <span class="nm">buffalo_l</span> model loaded into RAM
+→ System ready at <span class="st">http://localhost:8000</span></div>
+        </div>
+      </div>
+
+      <!-- Step 2: Auth -->
+      <div class="workflow-step">
+        <div class="step-num auth">2</div>
+        <div class="step-content">
+          <div class="step-title">🔐 Authentication (Admin Login)</div>
+          <div class="step-desc">Admin users log in at <code style="font-family:monospace; background:#f1f5f9; padding:1px 6px; border-radius:4px;">/login</code>. The frontend sends credentials to <code style="font-family:monospace; background:#f1f5f9; padding:1px 6px; border-radius:4px;">POST /api/token</code> and receives a JWT. The token is stored in <code style="font-family:monospace; background:#f1f5f9; padding:1px 6px; border-radius:4px;">localStorage</code> via <code style="font-family:monospace; background:#f1f5f9; padding:1px 6px; border-radius:4px;">AuthContext</code>. <strong>ProtectedRoute</strong> components guard the Dashboard, Register, Search, and Reports pages — redirecting unauthenticated users to <code style="font-family:monospace; background:#f1f5f9; padding:1px 6px; border-radius:4px;">/login</code>.</div>
+        </div>
+      </div>
+
+      <!-- Step 3: Register -->
+      <div class="workflow-step">
+        <div class="step-num reg">3</div>
+        <div class="step-content">
+          <div class="step-title">📝 Register a Missing Child</div>
+          <div class="step-desc">An admin fills in the child's details and uploads a face photo on the <strong>Register</strong> page. The form is submitted as <code style="font-family:monospace; background:#f1f5f9; padding:1px 6px; border-radius:4px;">multipart/form-data</code> to the backend, which runs the full AI pipeline:</div>
+          <div class="code-block"><span class="cm">// POST /api/register/  (fields: name, age, gender, location, phone, email, file)</span>
+1. Validate gender &amp; image format
+2. Decode image → OpenCV BGR array
+3. <span class="fn">InsightFace.get(image)</span> → detect faces
+4. Reject if <span class="op">0 faces</span> or <span class="op">&gt;1 face</span>
+5. Extract 512-dim ArcFace embedding → L2 normalize
+6. Save image to <span class="st">/uploads/&lt;uuid&gt;.jpg</span>
+7. INSERT child + embedding (vector(512)) → PostgreSQL
+→ Returns: <span class="nm">ChildOut</span> JSON</div>
+        </div>
+      </div>
+
+      <!-- Step 4: Search -->
+      <div class="workflow-step">
+        <div class="step-num search">4</div>
+        <div class="step-content">
+          <div class="step-title">🔍 Search for a Found Child</div>
+          <div class="step-desc">Anyone uploads a photo of a found child on the <strong>Search</strong> page. The backend generates an embedding and performs a vector similarity search against all registered missing children:</div>
+          <div class="code-block"><span class="cm">// POST /api/search/  (field: image)</span>
+1. Validate &amp; decode image
+2. <span class="fn">extract_embeddings()</span> → 512-dim ArcFace vector
+3. Save query image to <span class="st">/uploads/queries/</span>
+<span class="cm">-- pgvector SQL --</span>
+SELECT id, name, ...
+  FROM children WHERE status=<span class="st">'missing'</span>
+  ORDER BY arcface_embedding <span class="op">&lt;=&gt;</span> :query_vec ASC
+  LIMIT <span class="nm">top_k</span>  <span class="cm">-- distance &lt; threshold</span>
+4. Convert cosine distance → confidence% (sigmoid map)
+5. Log search entry → search_logs table
+→ Returns: <span class="nm">SearchResult</span> {match_found, matches[], message}</div>
+        </div>
+      </div>
+
+      <!-- Step 5: Alert -->
+      <div class="workflow-step">
+        <div class="step-num alert">5</div>
+        <div class="step-content">
+          <div class="step-title">🚨 Automated Alert System</div>
+          <div class="step-desc">If the best match confidence reaches <strong>≥ 85%</strong>, the system sends real-time alerts to the registered family contact — preventing duplicate alerts via the <code style="font-family:monospace; background:#f1f5f9; padding:1px 6px; border-radius:4px;">alert_sent</code> flag on the child's record.</div>
+          <div style="display:flex; gap:12px; margin-top:10px;">
+            <div style="flex:1; background:#fee2e2; border-radius:8px; padding:12px; font-size:12px;">
+              <strong>📧 Email Alert</strong><br>Sent to <code style="font-family:monospace;">contact_email</code> via SMTP if configured.
+            </div>
+            <div style="flex:1; background:#fef3c7; border-radius:8px; padding:12px; font-size:12px;">
+              <strong>📱 SMS Alert</strong><br>Sent to <code style="font-family:monospace;">contact_number</code> via Twilio if configured.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 6: Dashboard -->
+      <div class="workflow-step">
+        <div class="step-num dash">6</div>
+        <div class="step-content">
+          <div class="step-title">📊 Dashboard &amp; Reports</div>
+          <div class="step-desc"><strong>Dashboard</strong> displays system statistics (total missing children, total searches, matches found). <strong>Reports</strong> lists all search log entries with match details, confidence scores, timestamps, and IP addresses via <code style="font-family:monospace; background:#f1f5f9; padding:1px 6px; border-radius:4px;">GET /api/reports/</code>.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI PIPELINE -->
+    <div class="section">
+      <div class="section-title">
+        <div class="icon" style="background:#ede9fe;">🧠</div>
+        AI Face Recognition Pipeline
+      </div>
+      <div class="pipeline">
+        <div class="pip-step">Image Input<br><span style="font-weight:400; font-size:10px;">JPEG / PNG</span></div>
+        <div class="pip-arrow">→</div>
+        <div class="pip-step highlight">SCRFD<br><span style="font-weight:400; font-size:10px;">Face Detection</span></div>
+        <div class="pip-arrow">→</div>
+        <div class="pip-step highlight">Alignment<br><span style="font-weight:400; font-size:10px;">Landmark crop</span></div>
+        <div class="pip-arrow">→</div>
+        <div class="pip-step highlight">ArcFace<br><span style="font-weight:400; font-size:10px;">512-dim embed</span></div>
+        <div class="pip-arrow">→</div>
+        <div class="pip-step">L2 Normalize<br><span style="font-weight:400; font-size:10px;">Cosine-ready</span></div>
+        <div class="pip-arrow">→</div>
+        <div class="pip-step">pgvector DB<br><span style="font-weight:400; font-size:10px;">Store / Search</span></div>
+      </div>
+      <p style="font-size:12px; color:#64748b; margin-top:10px;">Model: <strong>InsightFace buffalo_l</strong> running on ONNX Runtime (CPU). Initialized once at startup. Both Registration and Search run through the same pipeline — ensuring embedding consistency.</p>
+    </div>
+
+    <!-- KEY FILES TABLE -->
+    <div class="section">
+      <div class="section-title">
+        <div class="icon" style="background:#d1fae5;">📁</div>
+        Key File Map
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>File</th>
+            <th>Layer</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>docker-compose.yml</td><td>Infrastructure</td><td>Orchestrates DB, Backend, Frontend containers</td></tr>
+          <tr><td>backend/main.py</td><td>Backend Entry</td><td>FastAPI app setup, CORS, routers, SPA fallback</td></tr>
+          <tr><td>backend/config.py</td><td>Config</td><td>Env settings: DB URL, thresholds, upload directory</td></tr>
+          <tr><td>backend/models.py</td><td>ORM</td><td><code>Child</code> (with 512-d vector), <code>SearchLog</code> tables</td></tr>
+          <tr><td>backend/schemas.py</td><td>Validation</td><td>Pydantic I/O schemas for API request/response</td></tr>
+          <tr><td>backend/auth.py</td><td>Auth</td><td>JWT token generation &amp; verification</td></tr>
+          <tr><td>routers/register.py</td><td>API</td><td>Child registration endpoint — full pipeline</td></tr>
+          <tr><td>routers/search.py</td><td>API</td><td>Face search + alert trigger logic</td></tr>
+          <tr><td>services/face_recognition.py</td><td>AI</td><td>InsightFace init + <code>extract_embeddings()</code></td></tr>
+          <tr><td>services/similarity.py</td><td>AI</td><td>pgvector cosine search + confidence scoring</td></tr>
+          <tr><td>frontend/src/App.jsx</td><td>Frontend</td><td>React Router: Login, Dashboard, Register, Search, Reports</td></tr>
+          <tr><td>frontend/src/context/AuthContext.jsx</td><td>Frontend</td><td>JWT state management across the app</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- KEY DECISIONS -->
+    <div class="section">
+      <div class="section-title">
+        <div class="icon" style="background:#fef3c7;">🔑</div>
+        Key Design Decisions
+      </div>
+      <div class="decision-grid">
+        <div class="decision-card">
+          <div class="dc-tag tag-ai">AI / Model</div>
+          <div class="dc-what">InsightFace over DeepFace / TensorFlow</div>
+          <div class="dc-why">Eliminated download failures; lightweight ONNX runtime with no GPU needed. Consistent performance across environments.</div>
+        </div>
+        <div class="decision-card">
+          <div class="dc-tag tag-db">Database</div>
+          <div class="dc-what">pgvector for similarity search</div>
+          <div class="dc-why">Native Postgres vector search — no separate vector DB (e.g., Pinecone/Weaviate) required. Simplifies deployment.</div>
+        </div>
+        <div class="decision-card">
+          <div class="dc-tag tag-ai">AI / Accuracy</div>
+          <div class="dc-what">512-dim ArcFace embeddings</div>
+          <div class="dc-why">Industry-standard embeddings with large-scale face recognition benchmarks. High discriminability reduces false positives.</div>
+        </div>
+        <div class="decision-card">
+          <div class="dc-tag tag-ux">Access Control</div>
+          <div class="dc-what">Public search, protected admin pages</div>
+          <div class="dc-why">Anyone can report or search for a missing child without login. Dashboard and Reports require admin JWT authentication.</div>
+        </div>
+        <div class="decision-card">
+          <div class="dc-tag tag-sec">Alerts</div>
+          <div class="dc-what">Alert threshold at 85% confidence</div>
+          <div class="dc-why">Sigmoid-mapped confidence scoring avoids false positive email/SMS alerts to family contacts. One-time alert enforced via <code>alert_sent</code> flag.</div>
+        </div>
+        <div class="decision-card">
+          <div class="dc-tag tag-sec">Security</div>
+          <div class="dc-what">Rate limiting on all API endpoints</div>
+          <div class="dc-why">SlowAPI + IP-based rate limiting prevents abuse of the open search endpoint and brute-force attacks on authentication.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /body -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>Missing Child Identification System (MCIS) — Internal Documentation</span>
+    <span>Generated: March 26, 2026</span>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>

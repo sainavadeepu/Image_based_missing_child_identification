@@ -1,0 +1,124 @@
+# MCIS — Build Walkthrough
+
+## What Was Built
+
+A complete, production-ready **Image Based Missing Child Identification System** at `c:\Users\ultra\Desktop\Missingchild`.
+
+---
+
+## File Map (45 files across 8 directories)
+
+```
+Missingchild/
+├── .gitignore               ✅ Python, Node, model, upload ignores
+├── README.md                ✅ Full setup guide + API reference
+├── docker-compose.yml       ✅ pgvector DB + FastAPI backend
+│
+├── backend/
+│   ├── main.py              ✅ FastAPI app, CORS, rate limiting, lifespan
+│   ├── config.py            ✅ Pydantic settings from .env
+│   ├── database.py          ✅ Async SQLAlchemy + pgvector session
+│   ├── models.py            ✅ Child + SearchLog ORM with Vector(512) column
+│   ├── schemas.py           ✅ Pydantic v2 schemas (ChildOut, SearchResult, Token)
+│   ├── auth.py              ✅ JWT + bcrypt, OAuth2 bearer dependency
+│   ├── requirements.txt     ✅ All Python deps pinned
+│   ├── Dockerfile           ✅ Multi-stage Python 3.11 image
+│   ├── .env.example         ✅ Template env file
+│   ├── routers/
+│   │   ├── auth_router.py   ✅ POST /auth/login → JWT token
+│   │   ├── register.py      ✅ POST /register/ (multipart, auth-protected)
+│   │   ├── search.py        ✅ POST /search/ (public)
+│   │   └── reports.py       ✅ GET /children (public) + GET /reports (protected)
+│   ├── services/
+│   │   ├── face_detection.py   ✅ YOLOv8 primary + OpenCV Haarcascade fallback
+│   │   ├── face_recognition.py ✅ DeepFace FaceNet512 → normalized 512-dim vector
+│   │   └── similarity.py       ✅ pgvector `<=>` cosine distance, distance→confidence %
+│   ├── utils/
+│   │   └── image_validation.py ✅ 10 MB limit, ext whitelist, PIL verification
+│   └── tests/
+│       ├── conftest.py      ✅ pytest-asyncio event loop
+│       └── test_main.py     ✅ Unit + integration tests
+│
+├── frontend/
+│   ├── package.json         ✅ React 18, Vite 5, Axios, React Router
+│   ├── vite.config.js       ✅ Dev proxy → localhost:8000
+│   ├── index.html           ✅ Inter font, SEO meta tags
+│   ├── vercel.json          ✅ SPA rewrite rules
+│   └── src/
+│       ├── main.jsx         ✅ React entry point
+│       ├── App.jsx          ✅ Router with protected routes
+│       ├── theme.css        ✅ Dark premium design system (tokens, cards, forms, animations)
+│       ├── components/
+│       │   ├── Navbar.jsx   ✅ Glassmorphism sticky nav + hamburger mobile menu
+│       │   └── Navbar.css
+│       ├── pages/
+│       │   ├── Home.jsx     ✅ Hero, stats, 3-step process, feature grid, CTA
+│       │   ├── Register.jsx ✅ Drag-drop upload, live preview, side tips panel
+│       │   ├── Search.jsx   ✅ Upload → results with confidence bars + match cards
+│       │   ├── Reports.jsx  ✅ Admin dashboard, stat pills, tabbed tables, status toggle
+│       │   └── Login.jsx    ✅ JWT login form, token storage
+│       └── services/
+│           └── api.js       ✅ Axios with JWT interceptor, all endpoint helpers
+│
+├── database/
+│   ├── schema.sql           ✅ pgvector ext, children table, IVFFlat index, search_logs
+│   └── init_db.py           ✅ Standalone asyncpg init script
+│
+├── dataset/
+│   ├── prepare_lfw_sample.py ✅ Downloads LFW, selects 10 identities, reg/test split
+│   └── evaluate.py           ✅ Accuracy, Precision, Recall, F1, Confusion Matrix
+│
+└── models/
+    └── download_models.py    ✅ Pre-downloads YOLOv8 + DeepFace FaceNet512
+```
+
+---
+
+## Key Architecture Decisions
+
+| Decision | Choice | Reason |
+|----------|--------|--------|
+| Embedding DB | `pgvector` IVFFlat | Cosine similarity at scale, SQL-native |
+| Face Detection | YOLOv8 + OpenCV fallback | Robust with graceful degradation |
+| Embedding model | DeepFace FaceNet512 | 512-dim, high accuracy, auto-download |
+| Similarity metric | Cosine distance (`<=>`) | Normalized vectors → consistent confidence % |
+| Auth | JWT + bcrypt | Stateless, industry standard |
+| Frontend | Vite + React 18 | Fast HMR, modern toolchain |
+| Deployment | Docker Compose + Vercel | Backend stateful, frontend serverless |
+
+---
+
+## Getting Started
+
+### Option A — Docker (quickest)
+```bash
+cd c:\Users\ultra\Desktop\Missingchild
+copy backend\.env.example backend\.env
+docker-compose up --build
+# API: http://localhost:8000/docs
+```
+
+### Option B — Local dev
+```bash
+# Backend
+cd backend && python -m venv venv && venv\Scripts\activate
+pip install -r requirements.txt
+# Start postgres: docker run -d --name pg -e POSTGRES_DB=mcis_db -e POSTGRES_USER=mcis_user -e POSTGRES_PASSWORD=mcis_password -p 5432:5432 pgvector/pgvector:pg16
+uvicorn main:app --reload
+
+# Frontend (new terminal)
+cd frontend && npm install && npm run dev
+# http://localhost:5173
+```
+
+### Admin Login
+- **Username**: `admin` | **Password**: `admin123` (configurable in `.env`)
+
+---
+
+## What's Tested
+- ✅ Cosine similarity math
+- ✅ Image validation (size, extension, binary)
+- ✅ `/health` endpoint returns 200
+- ✅ `/reports` requires JWT (401 without token)
+- ✅ `/auth/login` rejects bad credentials (401)
